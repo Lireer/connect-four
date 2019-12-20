@@ -1,0 +1,9 @@
+[package]
+name = "connect-four"
+version = "0.1.0"
+authors = ["Carl Scherer <Lireer@users.noreply.github.com>"]
+edition = "2018"
+
+[dependencies]
+ndarray = "0.13.0"
+itertools = "0.8.2"
