@@ -59,21 +59,3 @@ enum Color {
 struct Player {
     color: Color,
 }
-
-// Zur überprüfung wird pro board ein Vec Indizeveränderern genutzt um alle möglichen Siegachsen zu überprüfen
-// z.B.
-//      d = 3 (3-dimensional)
-//      Board dim = (7,6,4)
-//      New disk pos = [3,2,2] (Indizierung beginnend mit 0)
-//      Check Vec = [[1,0,0], //
-//                   [0,1,0], // These are moves using only one axes each
-//                   [0,0,1], //
-//                   [1,1,0],   //
-//                   [1,0,1],   // These are moves using two axes each
-//                   [0,1,1],   //
-//                   [1,1,1],      // This is a move using all three axis
-//                   ...    ] // To complete the vec add another vec for each possible combination of negative and positive ones
-//
-// Anzahl der zu überprüfenden Vektoren: $$\sum_{i=1}^{d} (2^i\binom{d}{i}) $$
-// Da aber sowieso immer in einer Geraden ausgehend von der aktuellen Position gesucht wird, sollte nur eine Hälfte der Vektoren
-// gespeichert werden, deren Inverse die fehlende Hälfte bildet.
