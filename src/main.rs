@@ -5,21 +5,26 @@ use std::collections::HashSet;
 const DIRECTIONS: [isize; 3] = [1, 0, -1];
 
 fn main() {
-    GameState::new(&[7,6]);
+    let game = dbg!(GameState::new(&[6,7,4]));
 }
 
+#[derive(Debug)]
 struct GameState {
     board: Array<Option<Color>, IxDyn>,
     players: [Player; 2],
-    check_vecs: Array<i8, IxDyn>,
+    check_vecs: HashSet<Array<isize, Ix1>>,
 }
 
 impl GameState {
-    pub fn new(dims: &[usize]) {
-        GameState::generate_check_vecs(dims.len());
+    pub fn new(dims: &[usize]) -> Self {
+        GameState {
+            board: Array::from_elem(dims, None),
+            players: GameState::default_players(),
+            check_vecs: GameState::generate_check_vecs(dims.len()),
+        }
     }
 
-    /// Generate the direction vectors needed for the 
+    /// Generate the direction vectors needed to check if a position is part 
     fn generate_check_vecs(n_dims: usize) -> HashSet<Array<isize, Ix1>> {
         
         // The number of vectors which will be stored.
@@ -47,9 +52,13 @@ impl GameState {
         directions.remove(&Array::from_elem(n_dims, 0));
         directions
     }
+
+    fn default_players() -> [Player; 2] {
+        [Player::new(Color::Red), Player::new(Color::Yellow)]
+    }
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 enum Color {
     Red,
     Yellow,
@@ -58,4 +67,10 @@ enum Color {
 #[derive(Debug)]
 struct Player {
     color: Color,
+}
+
+impl Player {
+    pub fn new(color: Color) -> Self {
+        Player { color }
+    }
 }
