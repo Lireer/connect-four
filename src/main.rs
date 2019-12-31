@@ -24,16 +24,15 @@ impl GameState {
         }
     }
 
-    /// Generate the direction vectors needed to check if a position is part 
+    /// Generate the direction vectors needed to check if a position is part of a winning row.
     fn generate_check_vecs(n_dims: usize) -> HashSet<Array<isize, Ix1>> {
-        
         // The number of vectors which will be stored.
         // `[-1, 0, 1]` are the possible directions per dimension.
         // This means there are `3^n_dims` possible combinations.
         // `[0, 0, 0]` is removed since it doesn't change the position.
         // Each vector needs to be associated with its inverse, so we only keep one of them,
         // which further cuts down the number of vectors by half.
-        let n_vecs = (3^n_dims-1)/2;
+        let n_vecs = (3usize.pow(n_dims as u32) - 1) / 2;
         let mut directions: HashSet<Array<isize, Ix1>> = HashSet::with_capacity(n_vecs);
 
         // Generate the direction vectors and add them to the set one by one,
@@ -41,9 +40,9 @@ impl GameState {
         (0..n_dims)
             .map(|_| DIRECTIONS.iter().cloned())
             .multi_cartesian_product()
-            .map(|vec| Array::from(vec))
+            .map(Array::from)
             .for_each(|vec| {
-                if !directions.contains(&-&vec) { 
+                if !directions.contains(&-&vec) {
                     directions.insert(vec);
                 }
             });
