@@ -73,7 +73,7 @@ impl GameState {
 
     fn check_input(&self, pos: &[usize]) {
         if pos.len() != self.board.ndim() - 1 {
-            panic!("The input position has to specify the coordinates in {} dimensions, but only {} were given",
+            panic!("The input position has to specify the coordinates in {} dimensions, but {} were given",
                 self.board.ndim() - 1,
                 pos.len()
             );
