@@ -8,8 +8,8 @@ use std::collections::HashSet;
 const DIRECTIONS: [isize; 3] = [1, 0, -1];
 
 fn main() {
-    let mut game = GameState::new(&[6, 7, 4, 4]).unwrap();
-    game.play_disk(Color::Red, &[1, 2, 2]);
+    let mut game = GameState::new(&[7, 6]).unwrap();
+    game.play_disk(Color::Red, vec![5]).unwrap();
 }
 
 #[derive(Debug)]
@@ -29,43 +29,37 @@ impl GameState {
         Ok(GameState {
             board: Array::from_elem(dims, None),
             players: GameState::default_players(),
-            check_vecs: dbg!(GameState::generate_check_vecs(dims.len())),
+            check_vecs: GameState::generate_check_vecs(dims.len()),
             round: 1,
         })
     }
 
-    pub fn play_disk(&mut self, color: Color, pos: &[usize]) -> Result<bool, GameError> {
-        self.check_input(pos);
-        let index = self.index_from_pos(pos);
+    pub fn play_disk(&mut self, color: Color, mut pos: Vec<usize>) -> Result<bool, GameError> {
+        self.check_input(&pos);
 
-        let disk_pos = dbg!(self.insert_disk(color, index)?);
-        let win = self.is_win_position(color, &disk_pos);
+        self.insert_disk(color, &mut pos)?;
+        let win = self.is_win_position(color, &pos);
         if !win {
             self.round += 1;
         }
         Ok(win)
     }
 
-    fn insert_disk(
-        &mut self,
-        color: Color,
-        mut insert_pos: Vec<ndarray::SliceOrIndex>,
-    ) -> Result<Vec<ndarray::SliceOrIndex>, GameError> {
-        let slice: ndarray::SliceInfo<_, IxDyn> = ndarray::SliceInfo::new(&insert_pos).unwrap();
+    fn insert_disk(&mut self, color: Color, pos: &mut Vec<usize>) -> Result<(), GameError> {
+        let index = self.index_from_pos(&pos);
+        let slice: ndarray::SliceInfo<_, IxDyn> = ndarray::SliceInfo::new(&index).unwrap();
         let column = self.board.slice_mut(slice.as_ref());
 
         if let Some((i, elem)) = column.into_iter().find_position(|elem| elem.is_none()) {
             *elem = Some(color);
-            if let Some(ind) = insert_pos.last_mut() {
-                *ind = ndarray::SliceOrIndex::from(i);
-                return Ok(insert_pos);
-            }
+            pos.push(i);
+            return Ok(());
         }
 
         Err(GameError::ColumnFull)
     }
 
-    fn is_win_position(&self, color: Color, pos: &[ndarray::SliceOrIndex]) -> bool {
+    fn is_win_position(&self, color: Color, pos: &[usize]) -> bool {
         unimplemented!()
     }
 
