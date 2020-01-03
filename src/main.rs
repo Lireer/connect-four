@@ -60,7 +60,60 @@ impl GameState {
     }
 
     fn is_win_position(&self, color: Color, pos: &[usize]) -> bool {
-        unimplemented!()
+        let pos = Array1::from(pos.to_owned()).map(|&p| p as isize);
+
+        for direction in &self.check_vecs {
+            let mut score = 1; // the starting position is already included
+            let mut checking = pos.to_owned();
+
+            // count the disks with `color` in the given `direction` and add them to the score
+            score += self.check_direction(color, &mut checking, direction);
+
+            if score >= 4 {
+                // checking in one direction can be enough
+                return true;
+            }
+
+            // now do the same in the opposite direction
+            checking = pos.to_owned();
+            score += self.check_direction(color, &mut checking, &-direction);
+            if score >= 4 {
+                return true;
+            }
+        }
+
+        false
+    }
+
+    fn check_direction(
+        &self,
+        color: Color,
+        starting_pos: &mut Array1<isize>,
+        direction: &Array1<isize>,
+    ) -> usize {
+        let mut score = 0;
+
+        for _ in 0..3 {
+            *starting_pos += direction;
+
+            let out_of_bounds = starting_pos
+                .indexed_iter()
+                .any(|(i, &ind)| ind < 0 || ind >= self.board.dim()[i] as isize);
+
+            if out_of_bounds
+                || !(Some(color)
+                    == self.board[starting_pos.map(|&i| i as usize).as_slice().unwrap()])
+            {
+                // First condition: The calculated position is outside the board, so there is
+                //                  nothing more to check in this direction.
+                // Second condition: Anything else in this direction will not add to the score
+                break;
+            }
+
+            score += 1;
+        }
+
+        score
     }
 
     fn check_input(&self, pos: &[usize]) {
