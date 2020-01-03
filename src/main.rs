@@ -18,7 +18,6 @@ struct GameState {
     players: [Player; 2],
     check_vecs: HashSet<Array1<isize>>,
     round: usize,
-    dimensions: usize,
 }
 
 impl GameState {
@@ -32,7 +31,6 @@ impl GameState {
             players: GameState::default_players(),
             check_vecs: dbg!(GameState::generate_check_vecs(dims.len())),
             round: 1,
-            dimensions: dims.len(),
         })
     }
 
@@ -86,7 +84,7 @@ impl GameState {
             .map(|&ind| ndarray::SliceOrIndex::from(ind))
             .collect::<Vec<ndarray::SliceOrIndex>>();
 
-        for _ in index.len()..self.dimensions {
+        for _ in index.len()..self.board.raw_dim().ndim() {
             index.push(ndarray::SliceOrIndex::from(..));
         }
 
