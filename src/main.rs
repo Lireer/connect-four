@@ -15,7 +15,6 @@ fn main() {
 #[derive(Debug)]
 struct GameState {
     board: ArrayD<Option<Color>>,
-    players: [Player; 2],
     check_vecs: HashSet<Array1<isize>>,
     round: usize,
 }
@@ -28,7 +27,6 @@ impl GameState {
 
         Ok(GameState {
             board: Array::from_elem(dims, None),
-            players: GameState::default_players(),
             check_vecs: GameState::generate_check_vecs(dims.len()),
             round: 1,
         })
@@ -169,25 +167,10 @@ impl GameState {
         directions.remove(&Array::from_elem(n_dims, 0));
         directions
     }
-
-    fn default_players() -> [Player; 2] {
-        [Player::new(Color::Red), Player::new(Color::Yellow)]
-    }
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 enum Color {
     Red,
     Yellow,
-}
-
-#[derive(Debug)]
-struct Player {
-    color: Color,
-}
-
-impl Player {
-    pub fn new(color: Color) -> Self {
-        Player { color }
-    }
 }
