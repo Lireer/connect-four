@@ -35,6 +35,10 @@ impl GameState {
     }
 
     pub fn play_disk(&mut self, color: Color, mut pos: Vec<usize>) -> Result<bool, GameError> {
+        if self.round > self.board.len() {
+            return Err(GameError::BoardFull);
+        }
+        
         self.check_input(&pos);
 
         self.insert_disk(color, &mut pos)?;
