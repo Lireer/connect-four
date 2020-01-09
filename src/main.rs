@@ -118,6 +118,18 @@ impl GameState {
         score
     }
 
+    pub fn max_rounds(&self) -> usize {
+        self.board.len()
+    }
+
+    pub const fn current_round(&self) -> usize {
+        self.round
+    }
+
+    pub const fn disks_played(&self) -> usize {
+        self.current_round() - 1
+    }
+
     fn check_input(&self, pos: &[usize]) {
         if pos.len() != self.board.ndim() - 1 {
             panic!("The input position has to specify the coordinates in {} dimensions, but {} were given",
