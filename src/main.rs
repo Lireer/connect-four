@@ -12,8 +12,8 @@ fn main() {
     game.play_disk(Color::Red, vec![5]).unwrap();
 }
 
-#[derive(Debug)]
-struct GameState {
+#[derive(Debug, Clone, PartialEq)]
+pub struct GameState {
     board: ArrayD<Option<Color>>,
     check_vecs: HashSet<Array1<isize>>,
     round: usize,
@@ -182,7 +182,44 @@ impl GameState {
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
-enum Color {
+pub enum Color {
     Red,
     Yellow,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{GameState, GameError, Color};
+
+    const N_DIMS: usize = 10;
+    const DIMS: [usize; N_DIMS] = [3; N_DIMS];
+    
+    #[test]
+    fn create_with_less_than_two_dimensions() {
+        assert_eq!(GameState::new(&[]), Err(GameError::TooFewDimensions));
+        assert_eq!(GameState::new(&[6]), Err(GameError::TooFewDimensions));
+    }
+
+    #[test]
+    fn create_with_up_to_ten_dimensions() {
+        for i in 1..N_DIMS-1 {
+            assert!(GameState::new(&DIMS[0..=i]).is_ok());
+        }
+    }
+
+    #[test]
+    fn board_full_2d() {
+        let mut game = GameState::new(&DIMS[0..2]).unwrap();
+
+        // fill the board with yellow disks
+        // the game can't finish, since no dimension is longer than 3
+        for i in 0..game.max_rounds() {
+            assert_eq!(game.play_disk(Color::Yellow, vec![i % 3]), Ok(false));
+        }
+
+        // check every possible input location
+        for i in 0..3 {
+            assert_eq!(game.play_disk(Color::Yellow, vec![i]), Err(GameError::BoardFull));
+        }
+    }
 }
