@@ -5,7 +5,7 @@ use itertools::Itertools;
 use ndarray::prelude::*;
 use std::collections::HashSet;
 
-const DIRECTIONS: [isize; 3] = [1, 0, -1];
+const POSITION_CHANGES: [isize; 3] = [1, 0, -1];
 
 fn main() {
     let mut game = GameState::new(&[7, 6]).unwrap();
@@ -154,7 +154,7 @@ impl GameState {
         // Generate the direction vectors and add them to the set one by one,
         // each time checking if their inverse is already part of the set.
         (0..n_dims)
-            .map(|_| DIRECTIONS.iter().cloned())
+            .map(|_| POSITION_CHANGES.iter().cloned())
             .multi_cartesian_product()
             .map(Array::from)
             .for_each(|vec| {
