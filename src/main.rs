@@ -36,7 +36,7 @@ impl GameState {
         if self.round > self.board.len() {
             return Err(GameError::BoardFull);
         }
-        
+
         self.check_input(&pos);
 
         self.insert_disk(color, &mut pos)?;
@@ -189,11 +189,11 @@ pub enum Color {
 
 #[cfg(test)]
 mod tests {
-    use super::{GameState, GameError, Color};
+    use super::{Color, GameError, GameState};
 
     const N_DIMS: usize = 10;
     const DIMS: [usize; N_DIMS] = [3; N_DIMS];
-    
+
     #[test]
     fn create_with_less_than_two_dimensions() {
         assert_eq!(GameState::new(&[]), Err(GameError::TooFewDimensions));
@@ -202,13 +202,13 @@ mod tests {
 
     #[test]
     fn create_with_up_to_ten_dimensions() {
-        for i in 1..N_DIMS-1 {
+        for i in 1..N_DIMS - 1 {
             assert!(GameState::new(&DIMS[0..=i]).is_ok());
         }
     }
 
     #[test]
-    fn board_full_2d() {
+    fn d2_board_full() {
         let mut game = GameState::new(&DIMS[0..2]).unwrap();
 
         // fill the board with yellow disks
@@ -219,7 +219,10 @@ mod tests {
 
         // check every possible input location
         for i in 0..3 {
-            assert_eq!(game.play_disk(Color::Yellow, vec![i]), Err(GameError::BoardFull));
+            assert_eq!(
+                game.play_disk(Color::Yellow, vec![i]),
+                Err(GameError::BoardFull)
+            );
         }
     }
 }
