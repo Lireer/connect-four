@@ -225,4 +225,28 @@ mod tests {
             );
         }
     }
+
+    #[test]
+    fn d2_big_board_full() {
+        let x = 1001;
+        let y = 1000;
+        let mut game = GameState::new(&[x, y]).unwrap();
+
+        // fill the board
+        let mut last_played = Color::Red;
+        let mut cur_color = Color::Yellow;
+
+        for i in 0..game.max_rounds() {
+            assert_eq!(game.play_disk(cur_color, vec![i * 2 % x]), Ok(false));
+            std::mem::swap(&mut last_played, &mut cur_color);
+        }
+
+        // check every possible input location
+        for i in 0..y {
+            assert_eq!(
+                game.play_disk(Color::Yellow, vec![i]),
+                Err(GameError::BoardFull)
+            );
+        }
+    }
 }
