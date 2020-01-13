@@ -9,7 +9,7 @@ const POSITION_CHANGES: [isize; 3] = [1, 0, -1];
 
 fn main() {
     let mut game = GameState::new(&[7, 6]).unwrap();
-    game.play_disk(Color::Red, vec![5]).unwrap();
+    game.play_disk(Color::Red, &mut vec![5]).unwrap();
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -32,18 +32,19 @@ impl GameState {
         })
     }
 
-    pub fn play_disk(&mut self, color: Color, mut pos: Vec<usize>) -> Result<bool, GameError> {
+    pub fn play_disk(&mut self, color: Color, mut pos: &mut Vec<usize>) -> Result<bool, GameError> {
         if self.round > self.board.len() {
             return Err(GameError::BoardFull);
         }
 
         self.check_input(&pos);
-
         self.insert_disk(color, &mut pos)?;
+
         let win = self.is_win_position(color, &pos);
         if !win {
             self.round += 1;
         }
+        
         Ok(win)
     }
 
@@ -214,13 +215,13 @@ mod tests {
         // fill the board with yellow disks
         // the game can't finish, since no dimension is longer than 3
         for i in 0..game.max_rounds() {
-            assert_eq!(game.play_disk(Color::Yellow, vec![i % 3]), Ok(false));
+            assert_eq!(game.play_disk(Color::Yellow, &mut vec![i % 3]), Ok(false));
         }
 
         // check every possible input location
         for i in 0..3 {
             assert_eq!(
-                game.play_disk(Color::Yellow, vec![i]),
+                game.play_disk(Color::Yellow, &mut vec![i]),
                 Err(GameError::BoardFull)
             );
         }
@@ -237,14 +238,14 @@ mod tests {
         let mut cur_color = Color::Yellow;
 
         for i in 0..game.max_rounds() {
-            assert_eq!(game.play_disk(cur_color, vec![i * 2 % x]), Ok(false));
+            assert_eq!(game.play_disk(cur_color, &mut vec![i * 2 % x]), Ok(false));
             std::mem::swap(&mut last_played, &mut cur_color);
         }
 
         // check every possible input location
         for i in 0..y {
             assert_eq!(
-                game.play_disk(Color::Yellow, vec![i]),
+                game.play_disk(Color::Yellow, &mut vec![i]),
                 Err(GameError::BoardFull)
             );
         }
