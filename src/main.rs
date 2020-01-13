@@ -32,6 +32,16 @@ impl GameState {
         })
     }
 
+    /// Insert a disk, actually a hypersphere, into the board and check if this wins the game.
+    ///
+    /// A disk of the given `color` will be inserted at the position specified in `pos`.
+    /// This position has to specify the exact index of all but one dimensions.
+    /// The final position is the first free space along the unspecified axis.
+    /// `pos` is updated to point exactly to the newly added disk.
+    /// If there is no space left along this axis `Err(GameError::AxisFull)` will be returned.
+    /// 
+    /// Next this new position is checked for a winning row and the result returned.
+    /// If the game has not been won, the round counter is incremented by one.
     pub fn play_disk(&mut self, color: Color, mut pos: &mut Vec<usize>) -> Result<bool, GameError> {
         if self.round > self.board.len() {
             return Err(GameError::BoardFull);
@@ -44,10 +54,17 @@ impl GameState {
         if !win {
             self.round += 1;
         }
-        
+
         Ok(win)
     }
 
+    /// Insert a disk, actually a hypersphere, into the board.
+    ///
+    /// A disk of the given `color` will be inserted at the position specified in `pos`.
+    /// This position has to specify the exact index of all but one dimensions.
+    /// The final position is the first free space along the unspecified axis.
+    /// `pos` will be updated to point exactly to the newly added disk.
+    /// If there is no space left along this axis `Err(GameError::AxisFull)` will be returned.
     fn insert_disk(&mut self, color: Color, pos: &mut Vec<usize>) -> Result<(), GameError> {
         let index = self.index_from_pos(&pos);
         let slice: ndarray::SliceInfo<_, IxDyn> = ndarray::SliceInfo::new(&index).unwrap();
@@ -59,7 +76,7 @@ impl GameState {
             return Ok(());
         }
 
-        Err(GameError::ColumnFull)
+        Err(GameError::AxisFull)
     }
 
     fn is_win_position(&self, color: Color, pos: &[usize]) -> bool {
@@ -109,7 +126,8 @@ impl GameState {
             {
                 // First condition: The calculated position is outside the board, so there is
                 //                  nothing more to check in this direction.
-                // Second condition: Anything else in this direction will not add to the score
+                // Second condition: Stop looking in this direction if a field not containing a
+                //                   disk of the given color is found
                 break;
             }
 
